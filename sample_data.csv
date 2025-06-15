@@ -1,0 +1,39 @@
+user_id,timestamp,action,metadata
+user1,2024-03-20T10:00:00,session_start,"{""session_id"": ""S1"", ""device"": ""desktop""}"
+user1,2024-03-20T10:05:00,feature_use,"{""feature_name"": ""analytics"", ""duration"": 45}"
+user1,2024-03-20T10:30:00,proposal_create,"{""proposal_id"": ""P1"", ""type"": ""investment"", ""initial_value"": 1000000}"
+user1,2024-03-20T10:45:00,proposal_close,"{""proposal_id"": ""P1"", ""status"": ""accepted"", ""final_value"": 1000000}"
+user2,2024-03-20T11:00:00,session_start,"{""session_id"": ""S2"", ""device"": ""mobile""}"
+user2,2024-03-20T11:10:00,proposal_create,"{""proposal_id"": ""P2"", ""type"": ""investment"", ""initial_value"": 500000}"
+user2,2024-03-20T11:30:00,proposal_revision,"{""proposal_id"": ""P2"", ""revision_number"": 1, ""changes"": [""updated_terms""]}"
+user2,2024-03-20T11:45:00,proposal_revision,"{""proposal_id"": ""P2"", ""revision_number"": 2, ""changes"": [""updated_value""]}"
+user2,2024-03-20T12:00:00,proposal_close,"{""proposal_id"": ""P2"", ""status"": ""accepted"", ""final_value"": 550000}"
+user3,2024-03-20T13:00:00,session_start,"{""session_id"": ""S3"", ""device"": ""desktop""}"
+user3,2024-03-20T13:15:00,feature_use,"{""feature_name"": ""basic_analytics"", ""duration"": 15}"
+user3,2024-03-20T13:30:00,proposal_create,"{""proposal_id"": ""P3"", ""type"": ""investment"", ""initial_value"": 750000}"
+user3,2024-03-20T13:45:00,proposal_view,"{""proposal_id"": ""P3"", ""view_duration"": 300}"
+user3,2024-03-20T14:00:00,feedback,"{""feature_name"": ""basic_analytics"", ""rating"": 4, ""comment"": ""Easy to use but could use more features""}"
+user1,2024-03-20T10:30:00,proposal_revision,{"proposal_id": "P1", "revision": 1, "changes": ["updated_terms"]}
+user1,2024-03-20T11:00:00,proposal_revision,{"proposal_id": "P1", "revision": 2, "changes": ["updated_value"]}
+user1,2024-03-20T11:30:00,proposal_close,{"proposal_id": "P1", "status": "accepted", "final_value": 1200000}
+user2,2024-03-20T09:00:00,proposal_create,{"proposal_id": "P2", "type": "investment", "initial_value": 500000}
+user2,2024-03-20T09:15:00,proposal_close,{"proposal_id": "P2", "status": "accepted", "final_value": 500000}
+user3,2024-03-20T14:00:00,proposal_create,{"proposal_id": "P3", "type": "investment", "initial_value": 2000000}
+user3,2024-03-20T14:30:00,proposal_view,{"proposal_id": "P3", "view_duration": 300}
+user3,2024-03-20T15:00:00,proposal_view,{"proposal_id": "P3", "view_duration": 600}
+user4,2024-03-20T11:00:00,proposal_create,{"proposal_id": "P4", "type": "investment", "initial_value": 1500000}
+user4,2024-03-20T11:30:00,proposal_revision,{"proposal_id": "P4", "revision": 1, "changes": ["updated_terms"]}
+user4,2024-03-20T12:00:00,proposal_revision,{"proposal_id": "P4", "revision": 2, "changes": ["updated_value"]}
+user4,2024-03-20T12:30:00,proposal_revision,{"proposal_id": "P4", "revision": 3, "changes": ["updated_terms"]}
+user4,2024-03-20T13:00:00,proposal_close,{"proposal_id": "P4", "status": "accepted", "final_value": 1800000}
+user5,2024-03-20T13:00:00,proposal_create,{"proposal_id": "P5", "type": "investment", "initial_value": 800000}
+user5,2024-03-20T13:15:00,proposal_close,{"proposal_id": "P5", "status": "accepted", "final_value": 800000}
+user6,2024-03-20T16:00:00,proposal_create,{"proposal_id": "P6", "type": "investment", "initial_value": 3000000}
+user6,2024-03-20T16:30:00,proposal_view,{"proposal_id": "P6", "view_duration": 450}
+user6,2024-03-20T17:00:00,proposal_view,{"proposal_id": "P6", "view_duration": 900}
+user7,2024-03-20T10:00:00,proposal_create,{"proposal_id": "P7", "type": "investment", "initial_value": 1200000}
+user7,2024-03-20T10:30:00,proposal_revision,{"proposal_id": "P7", "revision": 1, "changes": ["updated_terms"]}
+user7,2024-03-20T11:00:00,proposal_close,{"proposal_id": "P7", "status": "accepted", "final_value": 1400000}
+user8,2024-03-20T14:00:00,proposal_create,{"proposal_id": "P8", "type": "investment", "initial_value": 2500000}
+user8,2024-03-20T14:30:00,proposal_view,{"proposal_id": "P8", "view_duration": 600}
+user8,2024-03-20T15:00:00,proposal_view,{"proposal_id": "P8", "view_duration": 1200} 

@@ -1,75 +1,59 @@
-# Behavioral Segmentation Agent
+# Grupa.io Behavioral Analysis
 
-A tool for analyzing user behaviors and generating meaningful segments based on interaction patterns, with a modern web interface for visualization.
-
-## Project Structure
-
-```
-.
-├── backend/
-│   ├── behavioral_segmentation_agent.py  # Core segmentation logic
-│   └── app.py                           # Flask backend server
-├── frontend/
-│   ├── static/
-│   │   ├── css/
-│   │   │   └── style.css               # Custom styles
-│   │   └── js/
-│   │       └── main.js                 # Frontend logic
-│   └── templates/
-│       └── index.html                  # Main dashboard template
-└── README.md
-```
+A Streamlit application for analyzing user behavior patterns and generating product recommendations.
 
 ## Features
 
-- User behavior analysis and segmentation
-- Real-time visualization of segment data
-- Interactive dashboard with key metrics
-- Pain point identification
-- Personalized recommendations
-- Modern, responsive UI
+- Upload and process user behavior CSV files
+- Cluster users based on behavioral patterns using UMAP + HDBSCAN
+- Interactive visualization of user clusters
+- AI-powered analysis of pain points and recommendations
+- A/B test roadmap management
 
-## Setup Instructions
+## Setup
 
 1. Install dependencies:
 ```bash
-pip install flask python-dotenv
+pip install -r requirements.txt
 ```
 
-2. Set up environment variables:
-Create a `.env` file in the root directory with:
-```
-OPENROUTER_API_KEY=your_api_key_here
+2. Set up your OpenAI API key:
+```bash
+export OPENAI_API_KEY='your-api-key-here'
 ```
 
 3. Run the application:
 ```bash
-cd backend
-python app.py
+streamlit run app.py
 ```
 
-4. Access the dashboard:
-Open your browser and navigate to `http://localhost:5000`
+## CSV Format
+
+The application expects a CSV file with the following columns:
+- `user_id`: Unique identifier for each user
+- `timestamp`: When the action occurred (ISO format)
+- `action`: The type of action performed
+- `metadata`: JSON string containing additional action details
+
+Example:
+```csv
+user_id,timestamp,action,metadata
+user1,2024-03-20T10:00:00,proposal_create,{"proposal_id": "123", "type": "investment"}
+user1,2024-03-20T10:30:00,proposal_revision,{"proposal_id": "123", "revision": 1}
+```
 
 ## Usage
 
-The dashboard will automatically:
-- Generate sample user behaviors
-- Analyze interaction patterns
-- Create meaningful segments
-- Display the top 3 segments with the most users
-- Show key metrics and recommendations for each segment
+1. Upload your CSV file using the sidebar
+2. View the interactive cluster visualization
+3. Select a cluster to see detailed analysis
+4. Add recommendations to your A/B test roadmap
+5. Manage your roadmap in the sidebar
 
 ## Development
 
-- Backend: Python/Flask
-- Frontend: HTML, Tailwind CSS, JavaScript
-- Dependencies: Flask, python-dotenv
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+The application is built with:
+- Streamlit for the UI
+- UMAP + HDBSCAN for clustering
+- Plotly for visualizations
+- OpenAI GPT-4 for insights generation
