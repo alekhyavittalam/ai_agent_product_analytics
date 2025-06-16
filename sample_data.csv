@@ -1,39 +1,39 @@
 user_id,timestamp,action,metadata
-user1,2024-03-20T10:00:00,session_start,"{""session_id"": ""S1"", ""device"": ""desktop""}"
-user1,2024-03-20T10:05:00,feature_use,"{""feature_name"": ""analytics"", ""duration"": 45}"
-user1,2024-03-20T10:30:00,proposal_create,"{""proposal_id"": ""P1"", ""type"": ""investment"", ""initial_value"": 1000000}"
-user1,2024-03-20T10:45:00,proposal_close,"{""proposal_id"": ""P1"", ""status"": ""accepted"", ""final_value"": 1000000}"
-user2,2024-03-20T11:00:00,session_start,"{""session_id"": ""S2"", ""device"": ""mobile""}"
-user2,2024-03-20T11:10:00,proposal_create,"{""proposal_id"": ""P2"", ""type"": ""investment"", ""initial_value"": 500000}"
-user2,2024-03-20T11:30:00,proposal_revision,"{""proposal_id"": ""P2"", ""revision_number"": 1, ""changes"": [""updated_terms""]}"
-user2,2024-03-20T11:45:00,proposal_revision,"{""proposal_id"": ""P2"", ""revision_number"": 2, ""changes"": [""updated_value""]}"
-user2,2024-03-20T12:00:00,proposal_close,"{""proposal_id"": ""P2"", ""status"": ""accepted"", ""final_value"": 550000}"
-user3,2024-03-20T13:00:00,session_start,"{""session_id"": ""S3"", ""device"": ""desktop""}"
-user3,2024-03-20T13:15:00,feature_use,"{""feature_name"": ""basic_analytics"", ""duration"": 15}"
-user3,2024-03-20T13:30:00,proposal_create,"{""proposal_id"": ""P3"", ""type"": ""investment"", ""initial_value"": 750000}"
-user3,2024-03-20T13:45:00,proposal_view,"{""proposal_id"": ""P3"", ""view_duration"": 300}"
-user3,2024-03-20T14:00:00,feedback,"{""feature_name"": ""basic_analytics"", ""rating"": 4, ""comment"": ""Easy to use but could use more features""}"
-user1,2024-03-20T10:30:00,proposal_revision,{"proposal_id": "P1", "revision": 1, "changes": ["updated_terms"]}
-user1,2024-03-20T11:00:00,proposal_revision,{"proposal_id": "P1", "revision": 2, "changes": ["updated_value"]}
-user1,2024-03-20T11:30:00,proposal_close,{"proposal_id": "P1", "status": "accepted", "final_value": 1200000}
-user2,2024-03-20T09:00:00,proposal_create,{"proposal_id": "P2", "type": "investment", "initial_value": 500000}
-user2,2024-03-20T09:15:00,proposal_close,{"proposal_id": "P2", "status": "accepted", "final_value": 500000}
-user3,2024-03-20T14:00:00,proposal_create,{"proposal_id": "P3", "type": "investment", "initial_value": 2000000}
-user3,2024-03-20T14:30:00,proposal_view,{"proposal_id": "P3", "view_duration": 300}
-user3,2024-03-20T15:00:00,proposal_view,{"proposal_id": "P3", "view_duration": 600}
-user4,2024-03-20T11:00:00,proposal_create,{"proposal_id": "P4", "type": "investment", "initial_value": 1500000}
-user4,2024-03-20T11:30:00,proposal_revision,{"proposal_id": "P4", "revision": 1, "changes": ["updated_terms"]}
-user4,2024-03-20T12:00:00,proposal_revision,{"proposal_id": "P4", "revision": 2, "changes": ["updated_value"]}
-user4,2024-03-20T12:30:00,proposal_revision,{"proposal_id": "P4", "revision": 3, "changes": ["updated_terms"]}
-user4,2024-03-20T13:00:00,proposal_close,{"proposal_id": "P4", "status": "accepted", "final_value": 1800000}
-user5,2024-03-20T13:00:00,proposal_create,{"proposal_id": "P5", "type": "investment", "initial_value": 800000}
-user5,2024-03-20T13:15:00,proposal_close,{"proposal_id": "P5", "status": "accepted", "final_value": 800000}
-user6,2024-03-20T16:00:00,proposal_create,{"proposal_id": "P6", "type": "investment", "initial_value": 3000000}
-user6,2024-03-20T16:30:00,proposal_view,{"proposal_id": "P6", "view_duration": 450}
-user6,2024-03-20T17:00:00,proposal_view,{"proposal_id": "P6", "view_duration": 900}
-user7,2024-03-20T10:00:00,proposal_create,{"proposal_id": "P7", "type": "investment", "initial_value": 1200000}
-user7,2024-03-20T10:30:00,proposal_revision,{"proposal_id": "P7", "revision": 1, "changes": ["updated_terms"]}
-user7,2024-03-20T11:00:00,proposal_close,{"proposal_id": "P7", "status": "accepted", "final_value": 1400000}
-user8,2024-03-20T14:00:00,proposal_create,{"proposal_id": "P8", "type": "investment", "initial_value": 2500000}
-user8,2024-03-20T14:30:00,proposal_view,{"proposal_id": "P8", "view_duration": 600}
-user8,2024-03-20T15:00:00,proposal_view,{"proposal_id": "P8", "view_duration": 1200} 
+user_FC_01,2024-05-01T09:00:00,proposal_create,"{""proposal_id"": ""P001"", ""type"": ""loan"", ""value"": 50000}"
+user_FC_01,2024-05-01T09:10:00,proposal_close,"{""proposal_id"": ""P001"", ""status"": ""accepted""}"
+user_FC_02,2024-05-01T10:00:00,proposal_create,"{""proposal_id"": ""P002"", ""type"": ""equity"", ""value"": 200000}"
+user_FC_02,2024-05-01T10:15:00,proposal_close,"{""proposal_id"": ""P002"", ""status"": ""accepted""}"
+user_FC_03,2024-05-01T11:00:00,proposal_create,"{""proposal_id"": ""P003"", ""type"": ""loan"", ""value"": 100000}"
+user_FC_03,2024-05-01T11:05:00,proposal_close,"{""proposal_id"": ""P003"", ""status"": ""accepted""}"
+user_HR_01,2024-05-02T09:00:00,proposal_create,"{""proposal_id"": ""P004"", ""type"": ""equity"", ""value"": 300000}"
+user_HR_01,2024-05-02T09:30:00,proposal_revision,"{""proposal_id"": ""P004"", ""revision_num"": 1}"
+user_HR_01,2024-05-02T10:00:00,proposal_revision,"{""proposal_id"": ""P004"", ""revision_num"": 2}"
+user_HR_01,2024-05-02T10:30:00,proposal_revision,"{""proposal_id"": ""P004"", ""revision_num"": 3}"
+user_HR_01,2024-05-02T11:00:00,proposal_close,"{""proposal_id"": ""P004"", ""status"": ""accepted""}"
+user_HR_02,2024-05-02T12:00:00,proposal_create,"{""proposal_id"": ""P005"", ""type"": ""loan"", ""value"": 80000}"
+user_HR_02,2024-05-02T12:45:00,proposal_revision,"{""proposal_id"": ""P005"", ""revision_num"": 1}"
+user_HR_02,2024-05-02T13:30:00,proposal_revision,"{""proposal_id"": ""P005"", ""revision_num"": 2}"
+user_HR_03,2024-05-02T14:00:00,proposal_create,"{""proposal_id"": ""P006"", ""type"": ""equity"", ""value"": 150000}"
+user_HR_03,2024-05-02T14:45:00,proposal_revision,"{""proposal_id"": ""P006"", ""revision_num"": 1}"
+user_G_01,2024-05-03T09:00:00,proposal_create,"{""proposal_id"": ""P007"", ""type"": ""loan"", ""value"": 70000}"
+user_G_01,2024-05-03T09:15:00,proposal_view,"{""proposal_id"": ""P007"", ""duration"": 300}"
+user_G_02,2024-05-03T10:00:00,proposal_create,"{""proposal_id"": ""P008"", ""type"": ""equity"", ""value"": 250000}"
+user_G_02,2024-05-03T10:30:00,session_end,"{""duration"": 1800}"
+user_FE_01,2024-05-04T09:00:00,session_start,"{""device"": ""mobile""}"
+user_FE_01,2024-05-04T09:10:00,feature_use,"{""feature_name"": ""analytics_dashboard""}"
+user_FE_01,2024-05-04T09:20:00,feature_use,"{""feature_name"": ""reporting_tool""}"
+user_FE_01,2024-05-04T09:30:00,feedback,"{""rating"": 4, ""comment"": ""Reporting is good, could be faster.""}"
+user_FE_02,2024-05-04T10:00:00,session_start,"{""device"": ""desktop""}"
+user_FE_02,2024-05-04T10:05:00,feature_use,"{""feature_name"": ""user_management""}"
+user_FE_02,2024-05-04T10:15:00,feedback,"{""rating"": 3, ""comment"": ""User mgmt is complex.""}"
+user_PU_01,2024-05-05T09:00:00,session_start,"{""device"": ""desktop""}"
+user_PU_01,2024-05-05T09:05:00,feature_use,"{""feature_name"": ""advanced_analytics""}"
+user_PU_01,2024-05-05T09:30:00,proposal_create,"{""proposal_id"": ""P009"", ""type"": ""equity"", ""value"": 500000}"
+user_PU_01,2024-05-05T09:45:00,proposal_close,"{""proposal_id"": ""P009"", ""status"": ""accepted""}"
+user_PU_01,2024-05-05T10:00:00,proposal_create,"{""proposal_id"": ""P010"", ""type"": ""loan"", ""value"": 120000}"
+user_PU_01,2024-05-05T10:10:00,proposal_close,"{""proposal_id"": ""P010"", ""status"": ""accepted""}"
+user_PU_02,2024-05-05T11:00:00,session_start,"{""device"": ""desktop""}"
+user_PU_02,2024-05-05T11:15:00,feature_use,"{""feature_name"": ""reporting_tool""}"
+user_PU_02,2024-05-05T11:30:00,feature_use,"{""feature_name"": ""advanced_analytics""}"
+user_PU_02,2024-05-05T12:00:00,proposal_create,"{""proposal_id"": ""P011"", ""type"": ""equity"", ""value"": 400000}"
+user_PU_02,2024-05-05T12:30:00,proposal_close,"{""proposal_id"": ""P011"", ""status"": ""accepted""}" 
