@@ -2,16 +2,16 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import json
-import umap
-import hdbscan
+# import umap # Removed, now in clustering.py
+# import hdbscan # Removed, now in clustering.py
 from datetime import datetime
 import plotly.express as px
 from typing import Dict, List, Tuple
 import os
 from pathlib import Path
-import openai
-from openai import OpenAI
-from dataclasses import dataclass
+# import openai # Removed, now in llm_agent.py
+# from openai import OpenAI # Removed, now in llm_agent.py
+# from dataclasses import dataclass # Removed, now in utils.py
 import logging
 
 # Import modules
@@ -25,355 +25,259 @@ logger = logging.getLogger(__name__)
 
 # Constants
 # OPENAI_API_KEY is now read from environment variable in main()
-EMBEDDING_DIM = 50  # Dimension for UMAP embedding
-MIN_CLUSTER_SIZE = 2  # Minimum size for HDBSCAN clusters
+# EMBEDDING_DIM = 50  # Removed, now in clustering.py
+# MIN_CLUSTER_SIZE = 2  # Removed, now in clustering.py
 
 # Remove global openai_client initialization
 # openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
-@dataclass
-class UserBehavior:
-    user_id: str
-    timestamp: datetime
-    action: str
-    metadata: Dict
+# @dataclass
+# class UserBehavior:
+#     user_id: str
+#     timestamp: datetime
+#     action: str
+#     metadata: Dict
 
-class BehavioralAnalyzer:
-    def __init__(self, api_key: str):
-        self.clusterer = None
-        self.embeddings = None
-        self.user_behaviors = None
-        self.cluster_summaries = None
-        self.user_actions_df = None
-        # Initialize OpenAI client within the class
-        if not api_key:
-            raise ValueError("OpenAI API Key not provided or found in environment variables.")
-        # Use OpenRouter base URL
-        self.openai_client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
+# class BehavioralAnalyzer:
+#     def __init__(self, api_key: str):
+#         self.clusterer = None
+#         self.embeddings = None
+#         self.user_behaviors = None
+#         self.cluster_summaries = None
+#         self.user_actions_df = None
+#         # Initialize OpenAI client within the class
+#         if not api_key:
+#             raise ValueError("OpenAI API Key not provided or found in environment variables.")
+#         # Use OpenRouter base URL
+#         self.openai_client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
         
-    def process_csv(self, csv_path: str) -> pd.DataFrame:
-        """Process CSV file into a DataFrame with proper types."""
-        try:
-            # Read CSV with proper handling of quoted fields
-            df = pd.read_csv(csv_path, quoting=1)  # QUOTE_ALL mode
+#     def process_csv(self, csv_path: str) -> pd.DataFrame:
+#         """Process CSV file into a DataFrame with proper types."""
+#         try:
+#             # Read CSV with proper handling of quoted fields
+#             df = pd.read_csv(csv_path, quoting=1)  # QUOTE_ALL mode
             
-            # Convert timestamp
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
+#             # Convert timestamp
+#             df['timestamp'] = pd.to_datetime(df['timestamp'])
             
-            # Drop rows with missing action or timestamp before processing
-            df.dropna(subset=['action', 'timestamp'], inplace=True)
+#             # Drop rows with missing action or timestamp before processing
+#             df.dropna(subset=['action', 'timestamp'], inplace=True)
             
-            # Process metadata column
-            def parse_metadata(x):
-                try:
-                    if isinstance(x, str) and x.strip():  # Check if string and not empty/whitespace
-                        # Remove any outer quotes and parse JSON
-                        x = x.strip('"')
-                        return json.loads(x)
-                    # If not a string, or empty string, return empty dict or existing dict
-                    return x if isinstance(x, dict) else {}
-                except json.JSONDecodeError as e:
-                    logger.warning(f"Error parsing metadata: {str(e)} for value: '{x}'")
-                    return {}
-                except Exception as e:
-                    logger.warning(f"Unexpected error parsing metadata: {str(e)} for value: '{x}'")
-                    return {}
+#             # Process metadata column
+#             def parse_metadata(x):
+#                 try:
+#                     if isinstance(x, str) and x.strip():  # Check if string and not empty/whitespace
+#                         # Remove any outer quotes and parse JSON
+#                         x = x.strip('"')
+#                         return json.loads(x)
+#                     # If not a string, or empty string, return empty dict or existing dict
+#                     return x if isinstance(x, dict) else {}
+#                 except json.JSONDecodeError as e:
+#                     logger.warning(f"Error parsing metadata: {str(e)} for value: '{x}'")
+#                     return {}
+#                 except Exception as e:
+#                     logger.warning(f"Unexpected error parsing metadata: {str(e)} for value: '{x}'")
+#                     return {}
             
-            df['metadata'] = df['metadata'].apply(parse_metadata)
+#             df['metadata'] = df['metadata'].apply(parse_metadata)
             
-            logger.info(f"Successfully processed CSV with {len(df)} rows")
-            return df
+#             logger.info(f"Successfully processed CSV with {len(df)} rows")
+#             return df
             
-        except Exception as e:
-            logger.error(f"Error processing CSV: {str(e)}")
-            raise ValueError(f"Failed to process CSV file: {str(e)}")
+#         except Exception as e:
+#             logger.error(f"Error processing CSV: {str(e)}")
+#             raise ValueError(f"Failed to process CSV file: {str(e)}")
     
-    def create_behavior_matrix(self, df: pd.DataFrame) -> Tuple[np.ndarray, List[str], pd.DataFrame]:
-        """Create a behavior matrix for clustering and return user IDs and the full user-action DataFrame."""
-        # Get unique actions
-        actions = df['action'].unique()
+#     def create_behavior_matrix(self, df: pd.DataFrame) -> Tuple[np.ndarray, List[str], pd.DataFrame]:
+#         """Create a behavior matrix for clustering and return user IDs and the full user-action DataFrame."""
+#         # Get unique actions
+#         actions = df['action'].unique()
         
-        # Create user-action matrix
-        user_actions_df = pd.crosstab(df['user_id'], df['action'])
+#         # Create user-action matrix
+#         user_actions_df = pd.crosstab(df['user_id'], df['action'])
         
-        # Fill missing actions with 0
-        for action in actions:
-            if action not in user_actions_df.columns:
-                user_actions_df[action] = 0
+#         # Fill missing actions with 0
+#         for action in actions:
+#             if action not in user_actions_df.columns:
+#                 user_actions_df[action] = 0
         
-        return user_actions_df.values, user_actions_df.index.tolist(), user_actions_df
+#         return user_actions_df.values, user_actions_df.index.tolist(), user_actions_df
     
-    def cluster_users(self, behavior_matrix: np.ndarray) -> Tuple[np.ndarray, hdbscan.HDBSCAN]:
-        """Cluster users using UMAP + HDBSCAN."""
-        # Reduce dimensionality with UMAP
-        reducer = umap.UMAP(n_components=2, random_state=42, spread=0.5, min_dist=0.001)
-        embeddings = reducer.fit_transform(behavior_matrix)
+#     def cluster_users(self, behavior_matrix: np.ndarray) -> Tuple[np.ndarray, hdbscan.HDBSCAN]:
+#         """Cluster users using UMAP + HDBSCAN."""
+#         # Reduce dimensionality with UMAP
+#         reducer = umap.UMAP(n_components=2, random_state=42, spread=0.5, min_dist=0.001)
+#         embeddings = reducer.fit_transform(behavior_matrix)
         
-        # Cluster with HDBSCAN
-        clusterer = hdbscan.HDBSCAN(min_cluster_size=MIN_CLUSTER_SIZE)
-        cluster_labels = clusterer.fit_predict(embeddings)
+#         # Cluster with HDBSCAN
+#         clusterer = hdbscan.HDBSCAN(min_cluster_size=MIN_CLUSTER_SIZE)
+#         cluster_labels = clusterer.fit_predict(embeddings)
         
-        return embeddings, clusterer
+#         return embeddings, clusterer
     
-    def get_cluster_feature_importance(self, user_actions_df: pd.DataFrame, cluster_id: int, df: pd.DataFrame) -> Dict:
-        """Identify top behavioral features differentiating a cluster."""
-        # Get user IDs for the current cluster
-        cluster_user_ids = df[df['cluster'] == cluster_id]['user_id'].unique()
+#     def get_cluster_feature_importance(self, user_actions_df: pd.DataFrame, cluster_id: int, df: pd.DataFrame) -> Dict:
+#         """Identify top behavioral features differentiating a cluster."""
+#         # Get user IDs for the current cluster
+#         cluster_user_ids = df[df['cluster'] == cluster_id]['user_id'].unique()
         
-        # Filter the user_actions_df for this cluster
-        cluster_user_actions = user_actions_df.loc[cluster_user_ids]
+#         # Filter the user_actions_df for this cluster
+#         cluster_user_actions = user_actions_df.loc[cluster_user_ids]
         
-        # Calculate mean action frequency for the cluster
-        cluster_mean_actions = cluster_user_actions.mean()
+#         # Calculate mean action frequency for the cluster
+#         cluster_mean_actions = cluster_user_actions.mean()
         
-        # Calculate overall mean action frequency
-        overall_mean_actions = user_actions_df.mean()
+#         # Calculate overall mean action frequency
+#         overall_mean_actions = user_actions_df.mean()
         
-        # Calculate the ratio of cluster mean to overall mean (avoid division by zero)
-        # Add a small epsilon to avoid division by zero for overall_mean_actions that are 0
-        ratio = cluster_mean_actions / (overall_mean_actions + 1e-6)
+#         # Calculate the ratio of cluster mean to overall mean (avoid division by zero)
+#         # Add a small epsilon to avoid division by zero for overall_mean_actions that are 0
+#         ratio = cluster_mean_actions / (overall_mean_actions + 1e-6)
         
-        # Identify top positive and negative differentiating features
-        # Positive: actions much more frequent in this cluster
-        # Negative: actions much less frequent in this cluster (compared to other actions)
+#         # Identify top positive and negative differentiating features
+#         # Positive: actions much more frequent in this cluster
+#         # Negative: actions much less frequent in this cluster (compared to other actions)
 
-        # We'll use a threshold, e.g., ratio > 1.5 for more frequent, ratio < 0.5 for less frequent
-        differentiating_features = {
-            'highly_frequent': ratio[ratio > 1.5].sort_values(ascending=False).index.tolist(),
-            'less_frequent': ratio[ratio < 0.5].sort_values(ascending=True).index.tolist()
-        }
+#         # We'll use a threshold, e.g., ratio > 1.5 for more frequent, ratio < 0.5 for less frequent
+#         differentiating_features = {
+#             'highly_frequent': ratio[ratio > 1.5].sort_values(ascending=False).index.tolist(),
+#             'less_frequent': ratio[ratio < 0.5].sort_values(ascending=True).index.tolist()
+#         }
 
-        return differentiating_features
+#         return differentiating_features
 
-    def get_cluster_summary(self, df: pd.DataFrame, cluster_id: int) -> Dict:
-        """Generate summary statistics for a cluster."""
-        cluster_users = df[df['cluster'] == cluster_id]['user_id'].unique()
-        cluster_data = df[df['user_id'].isin(cluster_users)]
+#     def get_cluster_summary(self, df: pd.DataFrame, cluster_id: int) -> Dict:
+#         """Generate summary statistics for a cluster."""
+#         cluster_users = df[df['cluster'] == cluster_id]['user_id'].unique()
+#         cluster_data = df[df['user_id'].isin(cluster_users)]
         
-        # Initialize detailed summaries
-        feature_usage_details = {}
-        feedback_comments = []
-        proposal_status = {'created': 0, 'revised': 0, 'closed': 0, 'viewed_only': 0}
+#         # Initialize detailed summaries
+#         feature_usage_details = {}
+#         feedback_comments = []
+#         proposal_status = {'created': 0, 'revised': 0, 'closed': 0, 'viewed_only': 0}
         
-        # Iterate through cluster data to gather detailed info
-        for _, row in cluster_data.iterrows():
-            action = row['action']
-            metadata = row['metadata']
+#         # Iterate through cluster data to gather detailed info
+#         for _, row in cluster_data.iterrows():
+#             action = row['action']
+#             metadata = row['metadata']
             
-            if action == 'feature_use':
-                feature_name = metadata.get('feature_name')
-                if feature_name:
-                    feature_usage_details[feature_name] = feature_usage_details.get(feature_name, 0) + 1
-            elif action == 'feedback':
-                comment = metadata.get('comment')
-                if comment:
-                    feedback_comments.append(comment)
-            elif action == 'proposal_create':
-                proposal_status['created'] += 1
-            elif action == 'proposal_revision':
-                proposal_status['revised'] += 1
-            elif action == 'proposal_close':
-                proposal_status['closed'] += 1
-            elif action == 'proposal_view' and action not in cluster_data[cluster_data['user_id'] == row['user_id']]['action'].values:
-                # This is a simplification; a more robust check would involve checking for subsequent close actions
-                proposal_status['viewed_only'] += 1
+#             if action == 'feature_use':
+#                 feature_name = metadata.get('feature_name')
+#                 if feature_name:
+#                     feature_usage_details[feature_name] = feature_usage_details.get(feature_name, 0) + 1
+#             elif action == 'feedback':
+#                 comment = metadata.get('comment')
+#                 if comment:
+#                     feedback_comments.append(comment)
+#             elif action == 'proposal_create':
+#                 proposal_status['created'] += 1
+#             elif action == 'proposal_revision':
+#                 proposal_status['revised'] += 1
+#             elif action == 'proposal_close':
+#                 proposal_status['closed'] += 1
+#             elif action == 'proposal_view' and action not in cluster_data[cluster_data['user_id'] == row['user_id']]['action'].values:
+#                 # This is a simplification; a more robust check would involve checking for subsequent close actions
+#                 proposal_status['viewed_only'] += 1
 
-        # Calculate basic stats
-        stats = {
-            'user_count': len(cluster_users),
-            'total_actions': len(cluster_data),
-            'avg_actions_per_user': len(cluster_data) / len(cluster_users),
-            'common_actions': cluster_data['action'].value_counts().head(5).to_dict(),
-            'time_range': {
-                'start': cluster_data['timestamp'].min().isoformat(),
-                'end': cluster_data['timestamp'].max().isoformat()
-            },
-            'feature_usage_details': feature_usage_details,
-            'feedback_comments': feedback_comments,
-            'proposal_flow_status': proposal_status,
-            'differentiating_features': self.get_cluster_feature_importance(self.user_actions_df, cluster_id, df)
-        }
+#         # Calculate basic stats
+#         stats = {
+#             'user_count': len(cluster_users),
+#             'total_actions': len(cluster_data),
+#             'avg_actions_per_user': len(cluster_data) / len(cluster_users),
+#             'common_actions': cluster_data['action'].value_counts().head(5).to_dict(),
+#             'time_range': {
+#                 'start': cluster_data['timestamp'].min().isoformat(),
+#                 'end': cluster_data['timestamp'].max().isoformat()
+#             },
+#             'feature_usage_details': feature_usage_details,
+#             'feedback_comments': feedback_comments,
+#             'proposal_flow_status': proposal_status,
+#             'differentiating_features': self.get_cluster_feature_importance(self.user_actions_df, cluster_id, df)
+#         }
         
-        # Calculate conversion and completion rates based on proposal flow
-        # Conversion Rate: Users who closed a proposal / Users who created a proposal
-        created_proposals = proposal_status.get('created', 0)
-        closed_proposals = proposal_status.get('closed', 0)
+#         # Calculate conversion and completion rates based on proposal flow
+#         # Conversion Rate: Users who closed a proposal / Users who created a proposal
+#         created_proposals = proposal_status.get('created', 0)
+#         closed_proposals = proposal_status.get('closed', 0)
         
-        stats['conversion_rate'] = (closed_proposals / created_proposals) * 100 if created_proposals > 0 else 0
+#         stats['conversion_rate'] = (closed_proposals / created_proposals) * 100 if created_proposals > 0 else 0
         
-        # Completion Rate: Users who closed a proposal / Total unique users in cluster (simplified)
-        # Or, users who closed a proposal / users who interacted with proposals (created, revised, viewed)
-        total_proposal_interactions = created_proposals + proposal_status.get('revised', 0) + proposal_status.get('viewed_only', 0)
-        stats['completion_rate'] = (closed_proposals / total_proposal_interactions) * 100 if total_proposal_interactions > 0 else 0
+#         # Completion Rate: Users who closed a proposal / Total unique users in cluster (simplified)
+#         # Or, users who closed a proposal / users who interacted with proposals (created, revised, viewed)
+#         total_proposal_interactions = created_proposals + proposal_status.get('revised', 0) + proposal_status.get('viewed_only', 0)
+#         stats['completion_rate'] = (closed_proposals / total_proposal_interactions) * 100 if total_proposal_interactions > 0 else 0
 
-        # Calculate funnel metrics: number of unique users at each stage
-        # For each stage, count unique users who performed that action
-        funnel_metrics = {
-            'created': len(cluster_data[cluster_data['action'] == 'proposal_create']['user_id'].unique()),
-            'viewed': len(cluster_data[cluster_data['action'] == 'proposal_view']['user_id'].unique()),
-            'revised': len(cluster_data[cluster_data['action'] == 'proposal_revision']['user_id'].unique()),
-            'closed': len(cluster_data[cluster_data['action'] == 'proposal_close']['user_id'].unique())
-        }
-        stats['funnel_metrics'] = funnel_metrics
+#         # Calculate funnel metrics: number of unique users at each stage
+#         # For each stage, count unique users who performed that action
+#         funnel_metrics = {
+#             'created': len(cluster_data[cluster_data['action'] == 'proposal_create']['user_id'].unique()),
+#             'viewed': len(cluster_data[cluster_data['action'] == 'proposal_view']['user_id'].unique()),
+#             'revised': len(cluster_data[cluster_data['action'] == 'proposal_revision']['user_id'].unique()),
+#             'closed': len(cluster_data[cluster_data['action'] == 'proposal_close']['user_id'].unique())
+#         }
+#         stats['funnel_metrics'] = funnel_metrics
 
-        return stats
+#         return stats
     
-    def get_llm_insights(self, cluster_summary: Dict, output_mode: str = "pm", tone: str = "default") -> Dict:
-        """Get pain points and recommendations from LLM with different output modes and tones, optimized to focus on drop-offs and conversion bottlenecks."""
+# def generate_markdown_report(cluster_summary: Dict, insights: Dict, funnel_df: pd.DataFrame) -> str:
+#     """Generate a Markdown report with cluster insights and visualizations."""
+#     # Create markdown content
+#     md_content = f"""# Cluster Analysis Report
 
-        # Construct detailed statistics string
-        detailed_stats = f"""
-        Detailed Metrics:
-        - Specific Feature Usage: {cluster_summary['feature_usage_details']}
-        - User Feedback Comments: {cluster_summary['feedback_comments']}
-        - Proposal Flow Status (Created/Revised/Closed/Viewed Only): {cluster_summary['proposal_flow_status']}
-        - Differentiating Behavioral Features: {cluster_summary['differentiating_features']}
-        """
+# ## Cluster Overview
+# - **Name**: {insights['cluster_name']}
+# - **Persona**: {insights['persona']}
+# - **Metric Summary**: {insights['metric_summary_statement']}
 
-        # Define tone-specific instructions
-        tone_instructions = {
-            "default": "Provide clear, professional analysis.",
-            "ux_designer": "Focus on user experience, interaction patterns, and design implications.",
-            "developer": "Emphasize technical implementation details and code-level considerations.",
-            "business": "Highlight business impact, ROI, and strategic implications."
-        }
+# ## Key Performance Indicators
+# - **Conversion Rate**: {cluster_summary['conversion_rate']:.2f}%
+# - **Completion Rate**: {cluster_summary['completion_rate']:.2f}%
 
-        # Define output mode-specific instructions
-        mode_instructions = {
-            "pm": """You are analyzing a user segment on a proposal-based platform (like Grupa.io). Based on the metrics and behavioral patterns, your job is to:
-            1. Identify the **core behavioral intent** of users in this segment.
-            2. Determine **where in the proposal flow they are dropping off**, even if they interact with later stages (e.g., viewing without closing).
-            3. Focus on **conversion bottlenecks** — not just frequency of usage, but where users abandon or fail to complete expected flows.
-            4. Provide:
-
-                - **Cluster Name**: A concise name (e.g., "Stuck Reviewers", "Abandoned Creators").
-                - **Persona**: A 1-2 line summary of user behavior and goal.
-                - **Metric Summary**: Key behavioral insights, including drop-off ratios.
-                - **Pain Points**: Focused on product flow gaps (e.g., friction between proposal view and close).
-                - **Product Recommendations**: Strategic changes to help users fulfill intent.
-                - **Hypotheses**: For each pain point, give a testable hypothesis in the format: 
-                "[specific change] will [expected outcome] by [quantified improvement]."
-            """,
-                    "technical": """You are analyzing user segments for a product engineering team. Prioritize:
-            1. Identifying user flow breakdowns in the proposal lifecycle.
-            2. Highlighting points of UI/UX friction that prevent conversion.
-            3. Recommending backend/frontend changes to support smoother transitions (e.g., saving drafts, pre-fill content, nudges).
-
-            Provide:
-            - Cluster technical name
-            - Implementation-relevant persona
-            - Metric summary focused on engagement delta across funnel steps
-            - Technical pain points and recommendations
-            - Hypotheses for A/B testing improvements"""
-                }
-
-        # Final prompt string
-        prompt = f"""You are a product analytics assistant analyzing a user cluster.
-        Please infer and explain where users drop off in their journey — for example, Who drops off after visiting but doesn't start a proposal?, Who creates proposals but never submits them?, Who are your power users? etc.
-        Do not just describe the most frequent actions — focus on user intent and where it breaks.
-
-        Cluster Overview:
-        - Number of users: {cluster_summary['user_count']}
-        - Total actions: {cluster_summary['total_actions']}
-        - Average actions per user: {cluster_summary['avg_actions_per_user']}
-        - Most common actions: {cluster_summary['common_actions']}
-        - Time range: {cluster_summary['time_range']['start']} to {cluster_summary['time_range']['end']}
-        {detailed_stats}
-
-        {tone_instructions.get(tone, tone_instructions['default'])}
-        {mode_instructions.get(output_mode, mode_instructions['pm'])}
-
-        Output as valid JSON with these keys:
-        - 'cluster_name'
-        - 'persona'
-        - 'metric_summary_statement'
-        - 'pain_points' (list of 3)
-        - 'recommendations' (list of 3)
-        - 'hypotheses' (1 per pain point)
-        """
-
-        try:
-            response = self.openai_client.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
-                response_format={"type": "json_object"}
-            )
-            insights = json.loads(response.choices[0].message.content)
-            return insights
-
-        except Exception as e:
-            logger.error(f"Error getting LLM insights: {str(e)}")
-            return {
-                'cluster_name': "Error getting insights",
-                'persona': "Error getting insights",
-                'metric_summary_statement': "Error getting insights",
-                'pain_points': ["Error getting insights"],
-                'recommendations': ["Error getting recommendations"],
-                'hypotheses': ["Error generating hypotheses"]
-            }
-
-
-def generate_markdown_report(cluster_summary: Dict, insights: Dict, funnel_df: pd.DataFrame) -> str:
-    """Generate a Markdown report with cluster insights and visualizations."""
-    # Create markdown content
-    md_content = f"""# Cluster Analysis Report
-
-## Cluster Overview
-- **Name**: {insights['cluster_name']}
-- **Persona**: {insights['persona']}
-- **Metric Summary**: {insights['metric_summary_statement']}
-
-## Key Performance Indicators
-- **Conversion Rate**: {cluster_summary['conversion_rate']:.2f}%
-- **Completion Rate**: {cluster_summary['completion_rate']:.2f}%
-
-## User Journey Funnel
-| Stage | Users | Percentage |
-|-------|-------|------------|
-"""
+# ## User Journey Funnel
+# | Stage | Users | Percentage |
+# |-------|-------|------------|
+# """
     
-    # Add funnel data
-    for _, row in funnel_df.iterrows():
-        md_content += f"| {row['Stage']} | {row['Users']} | {row['Percentage']:.2f}% |\n"
+#     # Add funnel data
+#     for _, row in funnel_df.iterrows():
+#         md_content += f"| {row['Stage']} | {row['Users']} | {row['Percentage']:.2f}% |\n"
     
-    # Add pain points and hypotheses
-    md_content += "\n## Pain Points & Hypotheses\n"
-    for point, hypothesis in zip(insights['pain_points'], insights.get('hypotheses', [])):
-        md_content += f"### Pain Point: {point}\n"
-        md_content += f"**Hypothesis**: {hypothesis}\n\n"
+#     # Add pain points and hypotheses
+#     md_content += "\n## Pain Points & Hypotheses\n"
+#     for point, hypothesis in zip(insights['pain_points'], insights.get('hypotheses', [])):
+#         md_content += f"### Pain Point: {point}\n"
+#         md_content += f"**Hypothesis**: {hypothesis}\n\n"
     
-    # Add recommendations
-    md_content += "## Recommendations\n"
-    for i, rec in enumerate(insights['recommendations'], 1):
-        md_content += f"{i}. {rec}\n"
+#     # Add recommendations
+#     md_content += "## Recommendations\n"
+#     for i, rec in enumerate(insights['recommendations'], 1):
+#         md_content += f"{i}. {rec}\n"
     
-    return md_content
+#     return md_content
 
-def simulate_ab_test(recommendation: str) -> Dict:
-    """Simulate setting up an A/B test for a recommendation."""
-    # Generate a mock A/B test configuration
-    test_id = f"test_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+# def simulate_ab_test(recommendation: str) -> Dict:
+#     """Simulate setting up an A/B test for a recommendation."""
+#     # Generate a mock A/B test configuration
+#     test_id = f"test_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
-    # Parse the recommendation to extract key elements
-    elements = recommendation.lower().split()
+#     # Parse the recommendation to extract key elements
+#     elements = recommendation.lower().split()
     
-    # Generate mock metrics
-    metrics = {
-        "primary_metric": "completion_rate",
-        "secondary_metrics": ["time_to_complete", "user_satisfaction"],
-        "expected_improvement": f"{np.random.randint(5, 25)}%",
-        "minimum_sample_size": np.random.randint(100, 1000),
-        "test_duration_days": np.random.randint(7, 30)
-    }
+#     # Generate mock metrics
+#     metrics = {
+#         "primary_metric": "completion_rate",
+#         "secondary_metrics": ["time_to_complete", "user_satisfaction"],
+#         "expected_improvement": f"{np.random.randint(5, 25)}%",
+#         "minimum_sample_size": np.random.randint(100, 1000),
+#         "test_duration_days": np.random.randint(7, 30)
+#     }
     
-    return {
-        "test_id": test_id,
-        "recommendation": recommendation,
-        "metrics": metrics,
-        "status": "configured",
-        "created_at": datetime.now().isoformat()
-    }
+#     return {
+#         "test_id": test_id,
+#         "recommendation": recommendation,
+#         "metrics": metrics,
+#         "status": "configured",
+#         "created_at": datetime.now().isoformat()
+#     }
 
 def main():
     st.set_page_config(
@@ -479,6 +383,12 @@ def main():
     if 'ab_tests' not in st.session_state:
         st.session_state.ab_tests = []
     
+    # Initialize session state for insights and cluster summary
+    if 'current_insights' not in st.session_state:
+        st.session_state.current_insights = None
+    if 'current_cluster_summary' not in st.session_state:
+        st.session_state.current_cluster_summary = None
+
     # Sidebar
     st.sidebar.title("Grupa.io Analysis")
     
@@ -645,7 +555,8 @@ def main():
             selected_cluster_label = st.selectbox(
                 "Select Cluster",
                 options=sorted(plot_df['cluster_label'].unique()),
-                format_func=lambda x: x
+                format_func=lambda x: x,
+                key="cluster_selectbox"
             )
             
             # Map the selected label back to the numerical cluster ID for filtering
@@ -654,6 +565,7 @@ def main():
             if selected_cluster_label != 'Noise':
                 # Get cluster summary
                 cluster_summary = clustering_analyzer.get_cluster_summary(df, selected_cluster_id)
+                st.session_state.current_cluster_summary = cluster_summary # Store in session state
                 
                 # Add controls for output mode and tone
                 col1, col2 = st.columns(2)
@@ -662,31 +574,37 @@ def main():
                         "Output Mode",
                         options=["pm", "technical"],
                         format_func=lambda x: "Product Manager" if x == "pm" else "Technical",
-                        horizontal=True
+                        horizontal=True,
+                        key="output_mode_radio"
                     )
                 with col2:
                     tone = st.selectbox(
                         "Analysis Tone",
                         options=["default", "ux_designer", "developer", "business"],
-                        format_func=lambda x: x.replace("_", " ").title()
+                        format_func=lambda x: x.replace("_", " ").title(),
+                        key="analysis_tone_selectbox"
                     )
                 
-                # Get LLM insights with selected mode and tone
+                # Get LLM insights with selected mode and tone and store in session state
                 insights = llm_agent.get_llm_insights(cluster_summary, output_mode=output_mode, tone=tone)
+                st.session_state.current_insights = insights # Store in session state
                 
-                # Display cluster information
-                st.subheader(f"Cluster: {insights['cluster_name']}")
-                st.markdown(f"**Persona**: {insights['persona']}")
-                st.markdown(f"**Metric Summary**: {insights['metric_summary_statement']}")
+                # Display cluster information - retrieve from session state
+                insights_to_display = st.session_state.current_insights
+                cluster_summary_to_display = st.session_state.current_cluster_summary
+
+                st.subheader(f"Cluster: {insights_to_display['cluster_name']}")
+                st.markdown(f"**Persona**: {insights_to_display['persona']}")
+                st.markdown(f"**Metric Summary**: {insights_to_display['metric_summary_statement']}")
                 
                 # Display KPIs
                 st.subheader("Key Performance Indicators (KPIs)")
-                st.markdown(f"**Conversion Rate (Proposal Closed/Created)**: {cluster_summary['conversion_rate']:.2f}%")
-                st.markdown(f"**Completion Rate (Proposal Closed/Interaction)**: {cluster_summary['completion_rate']:.2f}%")
+                st.markdown(f"**Conversion Rate (Proposal Closed/Created)**: {cluster_summary_to_display['conversion_rate']:.2f}%")
+                st.markdown(f"**Completion Rate (Proposal Closed/Interaction)**: {cluster_summary_to_display['completion_rate']:.2f}%")
 
                 # Display funnel visualization
                 st.subheader("User Journey Funnel")
-                funnel_metrics = cluster_summary['funnel_metrics']
+                funnel_metrics = cluster_summary_to_display['funnel_metrics']
                 funnel_data = {
                     'Stage': ['Created', 'Viewed', 'Revised', 'Closed'],
                     'Users': [funnel_metrics['created'], funnel_metrics['viewed'], funnel_metrics['revised'], funnel_metrics['closed']]
@@ -696,15 +614,15 @@ def main():
                 fig_funnel = px.funnel(funnel_df, x='Percentage', y='Stage', title=f'User Journey Funnel - {selected_cluster_label}')
                 st.plotly_chart(fig_funnel, use_container_width=True)
 
-                # Display pain points and hypotheses
+                # Display pain points and hypotheses - retrieve from session state
                 st.subheader("Pain Points & Testable Hypotheses")
-                for i, (point, hypothesis) in enumerate(zip(insights['pain_points'], insights.get('hypotheses', []))):
+                for i, (point, hypothesis) in enumerate(zip(insights_to_display['pain_points'], insights_to_display.get('hypotheses', []))):
                     with st.expander(f"Pain Point {i+1}: {point}"):
                         st.markdown(f"**Hypothesis**: {hypothesis}")
                 
-                # Display recommendations with A/B test simulation
+                # Display recommendations with A/B test simulation - retrieve from session state
                 st.subheader("Recommendations")
-                for i, rec in enumerate(insights['recommendations']):
+                for i, rec in enumerate(insights_to_display['recommendations']):
                     col1, col2 = st.columns([3, 1])
                     with col1:
                         st.markdown(f"{i+1}. **{rec}**")
@@ -713,12 +631,14 @@ def main():
                             test_config = simulate_ab_test(rec)
                             st.session_state.ab_tests.append(test_config)
                             st.success(f"A/B test configured for: {rec}")
-                            st.json(test_config)
+                            # Display the just-simulated test in a new expander immediately
+                            with st.expander(f"Simulated Test Details: {test_config['test_id']}"):
+                                st.json(test_config)
 
-                # Export functionality
+                # Export functionality - retrieve from session state
                 st.subheader("Export Report")
                 if st.button("Generate Report"):
-                    markdown_content = generate_markdown_report(cluster_summary, insights, funnel_df)
+                    markdown_content = generate_markdown_report(cluster_summary_to_display, insights_to_display, funnel_df)
                     st.download_button(
                         label="Download Markdown Report",
                         data=markdown_content,
@@ -738,7 +658,7 @@ def main():
                             st.json(test)
 
                 with st.expander("View Raw Cluster Summary"):
-                    st.json(cluster_summary)
+                    st.json(cluster_summary_to_display)
             
         except Exception as e:
             st.error(f"Error processing file: {str(e)}")
