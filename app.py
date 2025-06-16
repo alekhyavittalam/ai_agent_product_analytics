@@ -14,6 +14,11 @@ from openai import OpenAI
 from dataclasses import dataclass
 import logging
 
+# Import modules
+from llm_agent import LLMAgent
+from clustering import ClusteringAnalyzer
+from utils import process_csv, generate_markdown_report, simulate_ab_test
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -556,8 +561,8 @@ def main():
             )
             st.markdown('</div>', unsafe_allow_html=True)
 
-        st.markdown("""---  
-    👉 Use the file uploader in the sidebar to get started!  
+        st.markdown("""---
+    👉 Use the file uploader in the sidebar to get started!
     """)
 
     
@@ -569,18 +574,20 @@ def main():
             return
 
         # Initialize analyzer
-        analyzer = BehavioralAnalyzer(api_key)
+        # analyzer = BehavioralAnalyzer(api_key)
+        llm_agent = LLMAgent(api_key)
+        clustering_analyzer = ClusteringAnalyzer()
         
         try:
             # Process CSV
-            df = analyzer.process_csv(uploaded_file)
+            df = process_csv(uploaded_file)
             
             # Create behavior matrix
-            behavior_matrix, user_ids_for_clustering, user_actions_df = analyzer.create_behavior_matrix(df)
-            analyzer.user_actions_df = user_actions_df
+            behavior_matrix, user_ids_for_clustering, user_actions_df = clustering_analyzer.create_behavior_matrix(df)
+            clustering_analyzer.user_actions_df = user_actions_df
             
             # Cluster users
-            embeddings, clusterer = analyzer.cluster_users(behavior_matrix)
+            embeddings, clusterer = clustering_analyzer.cluster_users(behavior_matrix)
             
             # Create a DataFrame for user_id and cluster labels from the clustering input
             user_to_cluster = pd.DataFrame({
@@ -646,7 +653,7 @@ def main():
 
             if selected_cluster_label != 'Noise':
                 # Get cluster summary
-                cluster_summary = analyzer.get_cluster_summary(df, selected_cluster_id)
+                cluster_summary = clustering_analyzer.get_cluster_summary(df, selected_cluster_id)
                 
                 # Add controls for output mode and tone
                 col1, col2 = st.columns(2)
@@ -665,7 +672,7 @@ def main():
                     )
                 
                 # Get LLM insights with selected mode and tone
-                insights = analyzer.get_llm_insights(cluster_summary, output_mode=output_mode, tone=tone)
+                insights = llm_agent.get_llm_insights(cluster_summary, output_mode=output_mode, tone=tone)
                 
                 # Display cluster information
                 st.subheader(f"Cluster: {insights['cluster_name']}")
