@@ -285,7 +285,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     st.set_page_config(
-        page_title="Grupa.io Behavioral Analysis",
+        page_title="Shopping Insights Dashboard",
         page_icon="📊",
         layout="wide",
         initial_sidebar_state="expanded"
