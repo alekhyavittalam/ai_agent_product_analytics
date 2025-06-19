@@ -81,7 +81,16 @@ class ClusteringAnalyzer:
         # Initialize detailed summaries
         feature_usage_details = {}
         feedback_comments = []
-        proposal_status = {'created': 0, 'revised': 0, 'closed': 0, 'viewed_only': 0}
+        shopping_status = {
+            'product_view': 0,
+            'search': 0,
+            'filter': 0,
+            'add_to_cart': 0,
+            'remove_from_cart': 0,
+            'abandon_cart': 0,
+            'checkout_start': 0,
+            'purchase_complete': 0
+        }
         
         # Iterate through cluster data to gather detailed info
         for _, row in cluster_data.iterrows():
@@ -96,15 +105,8 @@ class ClusteringAnalyzer:
                 comment = metadata.get('comment')
                 if comment:
                     feedback_comments.append(comment)
-            elif action == 'proposal_create':
-                proposal_status['created'] += 1
-            elif action == 'proposal_revision':
-                proposal_status['revised'] += 1
-            elif action == 'proposal_close':
-                proposal_status['closed'] += 1
-            elif action == 'proposal_view' and action not in cluster_data[cluster_data['user_id'] == row['user_id']]['action'].values:
-                # This is a simplification; a more robust check would involve checking for subsequent close actions
-                proposal_status['viewed_only'] += 1
+            elif action in shopping_status:
+                shopping_status[action] += 1
 
         # Calculate basic stats
         stats = {
@@ -118,29 +120,30 @@ class ClusteringAnalyzer:
             },
             'feature_usage_details': feature_usage_details,
             'feedback_comments': feedback_comments,
-            'proposal_flow_status': proposal_status,
+            'shopping_flow_status': shopping_status,
             'differentiating_features': self.get_cluster_feature_importance(self.user_actions_df, cluster_id, df)
         }
         
-        # Calculate conversion and completion rates based on proposal flow
-        # Conversion Rate: Users who closed a proposal / Users who created a proposal
-        created_proposals = proposal_status.get('created', 0)
-        closed_proposals = proposal_status.get('closed', 0)
+        # Calculate conversion and completion rates based on shopping flow
+        # Conversion Rate: Users who completed a purchase / Users who started checkout
+        started_checkout = shopping_status.get('checkout_start', 0)
+        completed_purchase = shopping_status.get('purchase_complete', 0)
+        stats['conversion_rate'] = (completed_purchase / started_checkout) * 100 if started_checkout > 0 else 0
         
-        stats['conversion_rate'] = (closed_proposals / created_proposals) * 100 if created_proposals > 0 else 0
-        
-        # Completion Rate: Users who closed a proposal / Total unique users in cluster (simplified)
-        # Or, users who closed a proposal / users who interacted with proposals (created, revised, viewed)
-        total_proposal_interactions = created_proposals + proposal_status.get('revised', 0) + proposal_status.get('viewed_only', 0)
-        stats['completion_rate'] = (closed_proposals / total_proposal_interactions) * 100 if total_proposal_interactions > 0 else 0
+        # Completion Rate: Users who completed a purchase / users who added to cart
+        added_to_cart = shopping_status.get('add_to_cart', 0)
+        stats['completion_rate'] = (completed_purchase / added_to_cart) * 100 if added_to_cart > 0 else 0
 
         # Calculate funnel metrics: number of unique users at each stage
-        # For each stage, count unique users who performed that action
         funnel_metrics = {
-            'created': len(cluster_data[cluster_data['action'] == 'proposal_create']['user_id'].unique()),
-            'viewed': len(cluster_data[cluster_data['action'] == 'proposal_view']['user_id'].unique()),
-            'revised': len(cluster_data[cluster_data['action'] == 'proposal_revision']['user_id'].unique()),
-            'closed': len(cluster_data[cluster_data['action'] == 'proposal_close']['user_id'].unique())
+            'product_view': len(cluster_data[cluster_data['action'] == 'product_view']['user_id'].unique()),
+            'search': len(cluster_data[cluster_data['action'] == 'search']['user_id'].unique()),
+            'filter': len(cluster_data[cluster_data['action'] == 'filter']['user_id'].unique()),
+            'add_to_cart': len(cluster_data[cluster_data['action'] == 'add_to_cart']['user_id'].unique()),
+            'remove_from_cart': len(cluster_data[cluster_data['action'] == 'remove_from_cart']['user_id'].unique()),
+            'abandon_cart': len(cluster_data[cluster_data['action'] == 'abandon_cart']['user_id'].unique()),
+            'checkout_start': len(cluster_data[cluster_data['action'] == 'checkout_start']['user_id'].unique()),
+            'purchase_complete': len(cluster_data[cluster_data['action'] == 'purchase_complete']['user_id'].unique())
         }
         stats['funnel_metrics'] = funnel_metrics
 

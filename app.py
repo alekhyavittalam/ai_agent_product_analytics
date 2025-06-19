@@ -209,10 +209,14 @@ logger = logging.getLogger(__name__)
 #         # Calculate funnel metrics: number of unique users at each stage
 #         # For each stage, count unique users who performed that action
 #         funnel_metrics = {
-#             'created': len(cluster_data[cluster_data['action'] == 'proposal_create']['user_id'].unique()),
-#             'viewed': len(cluster_data[cluster_data['action'] == 'proposal_view']['user_id'].unique()),
-#             'revised': len(cluster_data[cluster_data['action'] == 'proposal_revision']['user_id'].unique()),
-#             'closed': len(cluster_data[cluster_data['action'] == 'proposal_close']['user_id'].unique())
+#             'product_view': len(cluster_data[cluster_data['action'] == 'product_view']['user_id'].unique()),
+#             'search': len(cluster_data[cluster_data['action'] == 'search']['user_id'].unique()),
+#             'filter': len(cluster_data[cluster_data['action'] == 'filter']['user_id'].unique()),
+#             'add_to_cart': len(cluster_data[cluster_data['action'] == 'add_to_cart']['user_id'].unique()),
+#             'remove_from_cart': len(cluster_data[cluster_data['action'] == 'remove_from_cart']['user_id'].unique()),
+#             'abandon_cart': len(cluster_data[cluster_data['action'] == 'abandon_cart']['user_id'].unique()),
+#             'checkout_start': len(cluster_data[cluster_data['action'] == 'checkout_start']['user_id'].unique()),
+#             'purchase_complete': len(cluster_data[cluster_data['action'] == 'purchase_complete']['user_id'].unique())
 #         }
 #         stats['funnel_metrics'] = funnel_metrics
 
@@ -390,22 +394,22 @@ def main():
         st.session_state.current_cluster_summary = None
 
     # Sidebar
-    st.sidebar.title("Grupa.io Analysis")
+    st.sidebar.title("Shopping Insights")
     
     # File upload in sidebar
     uploaded_file = st.sidebar.file_uploader("Upload User Behavior CSV", type=['csv'])
     
     if uploaded_file is None:
         # Modern, clean welcome
-        st.markdown('<div class="title-text">🔍 Grupa.io Behavioral Insights Dashboard</div>', unsafe_allow_html=True)
-        st.markdown('<div class="subtitle-text">Upload your user interaction data and let AI uncover hidden pain points, drop-offs, and opportunities.</div>', unsafe_allow_html=True)
+        st.markdown('<div class="title-text">🛒 Shopping Website Behavioral Insights Dashboard</div>', unsafe_allow_html=True)
+        st.markdown('<div class="subtitle-text">Upload your user interaction data and let AI uncover hidden pain points, drop-offs, and opportunities in your shopping journey.</div>', unsafe_allow_html=True)
 
         with st.container():
             st.markdown('<div class="feature-card">', unsafe_allow_html=True)
             st.markdown('## 🚀 What You Can Do Here')
             st.markdown("""
             - **Segment Users**: Use clustering to identify behavior-based groups.
-            - **Diagnose Drop-Offs**: Pinpoint where users exit the proposal journey.
+            - **Diagnose Drop-Offs**: Pinpoint where users exit the shopping journey.
             - **Get Smart Insights**: Leverage AI for actionable recommendations.
             - **Plan Experiments**: Simulate A/B tests and generate hypotheses.
             """)
@@ -420,7 +424,7 @@ def main():
                 st.markdown('</div>', unsafe_allow_html=True)
 
                 st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-                st.markdown('### 📈 Proposal Journey Mapping')
+                st.markdown('### 🛍️ Shopping Journey Mapping')
                 st.markdown("- Funnel breakdown\n- Conversion and completion metrics")
                 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -442,7 +446,7 @@ def main():
 
             - `user_id`: Unique identifier for each user  
             - `timestamp`: ISO format timestamps (e.g., 2024-03-20T10:00:00)  
-            - `action`: The type of user interaction (e.g., `proposal_create`)  
+            - `action`: The type of user interaction (e.g., `product_view`, `add_to_cart`, `purchase_complete`)  
             - `metadata`: JSON metadata related to the action
             """)
             st.markdown('</div>', unsafe_allow_html=True)
@@ -450,22 +454,40 @@ def main():
             st.markdown('<div class="feature-card">', unsafe_allow_html=True)
             st.markdown('### 📁 Sample Data Preview')
             st.code("""user_id,timestamp,action,metadata
-    user1,2024-03-20T10:00:00,proposal_create,{"feature_name":"basic"}
-    user1,2024-03-20T10:05:00,proposal_view,{"duration":120}
-    user2,2024-03-20T11:00:00,proposal_create,{"feature_name":"premium"}
-    user2,2024-03-20T11:10:00,proposal_revision,{"changes":2}
-    user3,2024-03-20T12:00:00,proposal_create,{"feature_name":"basic"}
-    user3,2024-03-20T12:15:00,proposal_close,{"success":true}""", language="csv")
+user1,2024-03-20T10:00:00,product_view,{"product_id":"A1"}
+user1,2024-03-20T10:01:00,search,{"query":"shoes"}
+user1,2024-03-20T10:02:00,filter,{"filter":"size:9"}
+user1,2024-03-20T10:03:00,add_to_cart,{"product_id":"A1"}
+user1,2024-03-20T10:04:00,checkout_start,{"cart_value":100}
+user1,2024-03-20T10:05:00,purchase_complete,{"order_id":"O1001"}
+user2,2024-03-20T11:00:00,product_view,{"product_id":"B2"}
+user2,2024-03-20T11:01:00,add_to_cart,{"product_id":"B2"}
+user2,2024-03-20T11:02:00,remove_from_cart,{"product_id":"B2"}
+user2,2024-03-20T11:03:00,abandon_cart,{}
+user3,2024-03-20T12:00:00,product_view,{"product_id":"C3"}
+user3,2024-03-20T12:01:00,add_to_cart,{"product_id":"C3"}
+user3,2024-03-20T12:02:00,checkout_start,{"cart_value":50}
+user3,2024-03-20T12:03:00,purchase_complete,{"order_id":"O1002"}
+""", language="csv")
 
             st.download_button(
                 label="⬇ Download Sample CSV",
                 data="""user_id,timestamp,action,metadata
-    user1,2024-03-20T10:00:00,proposal_create,{"feature_name":"basic"}
-    user1,2024-03-20T10:05:00,proposal_view,{"duration":120}
-    user2,2024-03-20T11:00:00,proposal_create,{"feature_name":"premium"}
-    user2,2024-03-20T11:10:00,proposal_revision,{"changes":2}
-    user3,2024-03-20T12:00:00,proposal_create,{"feature_name":"basic"}
-    user3,2024-03-20T12:15:00,proposal_close,{"success":true}""",
+user1,2024-03-20T10:00:00,product_view,{"product_id":"A1"}
+user1,2024-03-20T10:01:00,search,{"query":"shoes"}
+user1,2024-03-20T10:02:00,filter,{"filter":"size:9"}
+user1,2024-03-20T10:03:00,add_to_cart,{"product_id":"A1"}
+user1,2024-03-20T10:04:00,checkout_start,{"cart_value":100}
+user1,2024-03-20T10:05:00,purchase_complete,{"order_id":"O1001"}
+user2,2024-03-20T11:00:00,product_view,{"product_id":"B2"}
+user2,2024-03-20T11:01:00,add_to_cart,{"product_id":"B2"}
+user2,2024-03-20T11:02:00,remove_from_cart,{"product_id":"B2"}
+user2,2024-03-20T11:03:00,abandon_cart,{}
+user3,2024-03-20T12:00:00,product_view,{"product_id":"C3"}
+user3,2024-03-20T12:01:00,add_to_cart,{"product_id":"C3"}
+user3,2024-03-20T12:02:00,checkout_start,{"cart_value":50}
+user3,2024-03-20T12:03:00,purchase_complete,{"order_id":"O1002"}
+""",
                 file_name="sample_behavior_data.csv",
                 mime="text/csv"
             )
@@ -599,18 +621,30 @@ def main():
                 
                 # Display KPIs
                 st.subheader("Key Performance Indicators (KPIs)")
-                st.markdown(f"**Conversion Rate (Proposal Closed/Created)**: {cluster_summary_to_display['conversion_rate']:.2f}%")
-                st.markdown(f"**Completion Rate (Proposal Closed/Interaction)**: {cluster_summary_to_display['completion_rate']:.2f}%")
+                st.markdown(f"**Conversion Rate (Purchase Complete/Checkout Start)**: {cluster_summary_to_display['conversion_rate']:.2f}%")
+                st.markdown(f"**Completion Rate (Purchase Complete/Add to Cart)**: {cluster_summary_to_display['completion_rate']:.2f}%")
 
                 # Display funnel visualization
                 st.subheader("User Journey Funnel")
                 funnel_metrics = cluster_summary_to_display['funnel_metrics']
                 funnel_data = {
-                    'Stage': ['Created', 'Viewed', 'Revised', 'Closed'],
-                    'Users': [funnel_metrics['created'], funnel_metrics['viewed'], funnel_metrics['revised'], funnel_metrics['closed']]
+                    'Stage': [
+                        'Product View', 'Search', 'Filter', 'Add to Cart', 'Remove from Cart',
+                        'Abandon Cart', 'Checkout Start', 'Purchase Complete'
+                    ],
+                    'Users': [
+                        funnel_metrics['product_view'],
+                        funnel_metrics['search'],
+                        funnel_metrics['filter'],
+                        funnel_metrics['add_to_cart'],
+                        funnel_metrics['remove_from_cart'],
+                        funnel_metrics['abandon_cart'],
+                        funnel_metrics['checkout_start'],
+                        funnel_metrics['purchase_complete']
+                    ]
                 }
                 funnel_df = pd.DataFrame(funnel_data)
-                funnel_df['Percentage'] = (funnel_df['Users'] / funnel_df['Users'].iloc[0]) * 100
+                funnel_df['Percentage'] = (funnel_df['Users'] / funnel_df['Users'].iloc[0]) * 100 if funnel_df['Users'].iloc[0] > 0 else 0
                 fig_funnel = px.funnel(funnel_df, x='Percentage', y='Stage', title=f'User Journey Funnel - {selected_cluster_label}')
                 st.plotly_chart(fig_funnel, use_container_width=True)
 

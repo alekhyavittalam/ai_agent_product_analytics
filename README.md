@@ -1,11 +1,11 @@
-# Grupa.io Behavioral Analysis Dashboard
+# Shopping Website Behavioral Analysis Dashboard
 
 ## Overview
-This Streamlit application provides a powerful tool for analyzing user behavior on a proposal-based platform like Grupa.io. It leverages clustering techniques (UMAP + HDBSCAN) and AI-powered insights to identify user segments, pinpoint drop-off points in the user journey, and generate actionable recommendations with testable hypotheses.
+This Streamlit application provides a powerful tool for analyzing user behavior on a shopping website. It leverages clustering techniques (UMAP + HDBSCAN) and AI-powered insights to identify user segments, pinpoint drop-off points in the shopping journey, and generate actionable recommendations with testable hypotheses.
 
 ## Features
 - **Behavioral Clustering**: Automatically segments users based on their interaction patterns, visualized with interactive UMAP plots where data point size scales with cluster size.
-- **User Journey Funnel**: Visualizes the user's progress through key stages of the proposal flow (e.g., Created, Viewed, Revised, Closed) to identify bottlenecks.
+- **User Journey Funnel**: Visualizes the user's progress through key stages of the shopping flow (e.g., Product View, Search, Filter, Add to Cart, Remove from Cart, Abandon Cart, Checkout Start, Purchase Complete) to identify bottlenecks.
 - **AI-Powered Insights**: Generates comprehensive insights, including cluster names, personas, metric summaries, pain points, recommendations, and A/B test hypotheses, with customizable output modes (Product Manager, Technical) and tones (UX Designer, Developer, Business).
 - **A/B Test Simulation**: Allows for quick simulation of A/B test configurations for each recommendation, providing mock metrics like expected improvement, sample size, and duration.
 - **Markdown Report Generation**: Export detailed analysis reports in Markdown format, including cluster overviews, KPIs, funnel data, pain points, hypotheses, and recommendations.
@@ -64,8 +64,8 @@ The application will open in your web browser, usually at `http://localhost:8501
     Your CSV must contain the following columns:
     -   `user_id`: Unique identifier for each user.
     -   `timestamp`: ISO format timestamps (e.g., `2024-03-20T10:00:00`).
-    -   `action`: The type of user interaction (e.g., `proposal_create`, `proposal_view`, `feature_use`).
-    -   `metadata`: A JSON string containing additional details about the action (e.g., `{"duration": 120}`, `{"feature_name": "basic"}`).
+    -   `action`: The type of user interaction (e.g., `product_view`, `add_to_cart`, `purchase_complete`).
+    -   `metadata`: A JSON string containing additional details about the action (e.g., `{"product_id": "A1"}`, `{"cart_value": 100}`).
 3.  **Explore Dashboard**: After uploading, the dashboard will display:
     -   **User Clusters**: An interactive scatter plot visualizing user clusters based on behavioral patterns.
     -   **Cluster Selection**: A dropdown to select individual clusters for detailed analysis.

@@ -22,7 +22,7 @@ class LLMAgent:
         Detailed Metrics:
         - Specific Feature Usage: {cluster_summary['feature_usage_details']}
         - User Feedback Comments: {cluster_summary['feedback_comments']}
-        - Proposal Flow Status (Created/Revised/Closed/Viewed Only): {cluster_summary['proposal_flow_status']}
+        - Shopping Flow Status (Product View/Search/Filter/Add to Cart/Remove from Cart/Abandon Cart/Checkout Start/Purchase Complete): {cluster_summary['shopping_flow_status']}
         - Differentiating Behavioral Features: {cluster_summary['differentiating_features']}
         """
 
@@ -36,24 +36,24 @@ class LLMAgent:
 
         # Define output mode-specific instructions
         mode_instructions = {
-            "pm": """You are analyzing a user segment on a proposal-based platform (like Grupa.io). Based on the metrics and behavioral patterns, your job is to:
+            "pm": """You are analyzing a user segment on a shopping website. Based on the metrics and behavioral patterns, your job is to:
             1. Identify the **core behavioral intent** of users in this segment.
-            2. Determine **where in the proposal flow they are dropping off**, even if they interact with later stages (e.g., viewing without closing).
+            2. Determine **where in the shopping journey they are dropping off**, even if they interact with later stages (e.g., add to cart without purchasing).
             3. Focus on **conversion bottlenecks** — not just frequency of usage, but where users abandon or fail to complete expected flows.
             4. Provide:
 
-                - **Cluster Name**: A concise name (e.g., "Stuck Reviewers", "Abandoned Creators").
+                - **Cluster Name**: A concise name (e.g., 'Cart Abandoners', 'Window Shoppers').
                 - **Persona**: A 1-2 line summary of user behavior and goal.
                 - **Metric Summary**: Key behavioral insights, including drop-off ratios.
-                - **Pain Points**: Focused on product flow gaps (e.g., friction between proposal view and close).
+                - **Pain Points**: Focused on product flow gaps (e.g., friction between add to cart and checkout).
                 - **Product Recommendations**: Strategic changes to help users fulfill intent.
                 - **Hypotheses**: For each pain point, give a testable hypothesis in the format: 
-                "[specific change] will [expected outcome] by [quantified improvement]."
+                '[specific change] will [expected outcome] by [quantified improvement].'
             """,
-                    "technical": """You are analyzing user segments for a product engineering team. Prioritize:
-            1. Identifying user flow breakdowns in the proposal lifecycle.
+            "technical": """You are analyzing user segments for a shopping website product engineering team. Prioritize:
+            1. Identifying user flow breakdowns in the shopping journey (product view, search, filter, add to cart, remove from cart, abandon cart, checkout start, purchase complete).
             2. Highlighting points of UI/UX friction that prevent conversion.
-            3. Recommending backend/frontend changes to support smoother transitions (e.g., saving drafts, pre-fill content, nudges).
+            3. Recommending backend/frontend changes to support smoother transitions (e.g., persistent carts, better search/filter UX, checkout nudges).
 
             Provide:
             - Cluster technical name
@@ -61,11 +61,11 @@ class LLMAgent:
             - Metric summary focused on engagement delta across funnel steps
             - Technical pain points and recommendations
             - Hypotheses for A/B testing improvements"""
-                }
+        }
 
         # Final prompt string
         prompt = f"""You are a product analytics assistant analyzing a user cluster.
-        Please infer and explain where users drop off in their journey — for example, Who drops off after visiting but doesn't start a proposal?, Who creates proposals but never submits them?, Who are your power users? etc.
+        Please infer and explain where users drop off in their shopping journey — for example, Who drops off after viewing but doesn't add to cart?, Who adds to cart but never checks out?, Who are your power users? etc.
         Do not just describe the most frequent actions — focus on user intent and where it breaks.
 
         Cluster Overview:
