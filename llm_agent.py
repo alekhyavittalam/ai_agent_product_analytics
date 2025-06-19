@@ -11,8 +11,11 @@ class LLMAgent:
     def __init__(self, api_key: str):
         if not api_key:
             raise ValueError("OpenAI API Key not provided or found in environment variables.")
-        # Use OpenRouter base URL
-        self.openai_client = OpenAI(api_key=api_key, base_url="https://openrouter.ai/api/v1")
+        # Use OpenRouter with your API key
+        self.openai_client = OpenAI(
+            api_key=api_key,
+            base_url="https://openrouter.ai/api/v1"
+        )
         
     def get_llm_insights(self, cluster_summary: Dict, output_mode: str = "pm", tone: str = "default") -> Dict:
         """Get pain points and recommendations from LLM with different output modes and tones, optimized to focus on drop-offs and conversion bottlenecks."""
@@ -92,10 +95,24 @@ class LLMAgent:
             response = self.openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
-                response_format={"type": "json_object"}
+                temperature=0.7
             )
-            insights = json.loads(response.choices[0].message.content)
+            
+            # Parse the response into JSON
+            try:
+                insights = json.loads(response.choices[0].message.content)
+            except json.JSONDecodeError:
+                # If JSON parsing fails, create a structured response
+                content = response.choices[0].message.content
+                insights = {
+                    'cluster_name': "Analysis Results",
+                    'persona': content[:200],  # First 200 characters as persona
+                    'metric_summary_statement': "See detailed analysis below",
+                    'pain_points': [content],
+                    'recommendations': ["Please review the analysis and formulate specific recommendations"],
+                    'hypotheses': ["Based on the analysis, specific hypotheses can be formulated"]
+                }
+            
             return insights
 
         except Exception as e:
