@@ -591,6 +591,13 @@ user3,2024-03-20T12:03:00,purchase_complete,{"order_id":"O1002"}
                 hover_data={'user_id': True, 'cluster': True, 'cluster_label': True, 'cluster_size': True},
                 title="User Clusters"
             )
+            
+            # Update axis labels
+            fig.update_layout(
+                xaxis_title="Behavioral Dimension 1",
+                yaxis_title="Behavioral Dimension 2"
+            )
+            
             st.plotly_chart(fig, use_container_width=True)
             
             # Handle cluster selection
