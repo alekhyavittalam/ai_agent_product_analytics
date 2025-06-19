@@ -453,7 +453,15 @@ def main():
 
             st.markdown('<div class="feature-card">', unsafe_allow_html=True)
             st.markdown('### 📁 Sample Data Preview')
-            st.code("""user_id,timestamp,action,metadata
+            
+            # Read the actual synthetic_demo_100.csv file
+            try:
+                with open('synthetic_demo_100.csv', 'r') as file:
+                    sample_data = file.read()
+                st.code(sample_data, language="csv")
+            except FileNotFoundError:
+                # Fallback to hardcoded sample if file not found
+                st.code("""user_id,timestamp,action,metadata
 user1,2024-03-20T10:00:00,product_view,{"product_id":"A1"}
 user1,2024-03-20T10:01:00,search,{"query":"shoes"}
 user1,2024-03-20T10:02:00,filter,{"filter":"size:9"}
@@ -470,9 +478,21 @@ user3,2024-03-20T12:02:00,checkout_start,{"cart_value":50}
 user3,2024-03-20T12:03:00,purchase_complete,{"order_id":"O1002"}
 """, language="csv")
 
-            st.download_button(
-                label="⬇ Download Sample CSV",
-                data="""user_id,timestamp,action,metadata
+            # Download button for the actual synthetic_demo_100.csv file
+            try:
+                with open('synthetic_demo_100.csv', 'r') as file:
+                    csv_data = file.read()
+                st.download_button(
+                    label="⬇ Download Sample CSV",
+                    data=csv_data,
+                    file_name="synthetic_demo_100.csv",
+                    mime="text/csv"
+                )
+            except FileNotFoundError:
+                # Fallback to hardcoded sample if file not found
+                st.download_button(
+                    label="⬇ Download Sample CSV",
+                    data="""user_id,timestamp,action,metadata
 user1,2024-03-20T10:00:00,product_view,{"product_id":"A1"}
 user1,2024-03-20T10:01:00,search,{"query":"shoes"}
 user1,2024-03-20T10:02:00,filter,{"filter":"size:9"}
@@ -488,9 +508,9 @@ user3,2024-03-20T12:01:00,add_to_cart,{"product_id":"C3"}
 user3,2024-03-20T12:02:00,checkout_start,{"cart_value":50}
 user3,2024-03-20T12:03:00,purchase_complete,{"order_id":"O1002"}
 """,
-                file_name="sample_behavior_data.csv",
-                mime="text/csv"
-            )
+                    file_name="sample_behavior_data.csv",
+                    mime="text/csv"
+                )
             st.markdown('</div>', unsafe_allow_html=True)
 
         st.markdown("""---
