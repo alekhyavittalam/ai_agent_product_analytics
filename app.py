@@ -654,26 +654,62 @@ user3,2024-03-20T12:03:00,purchase_complete,{"order_id":"O1002"}
                 # Display funnel visualization
                 st.subheader("User Journey Funnel")
                 funnel_metrics = cluster_summary_to_display['funnel_metrics']
-                funnel_data = {
-                    'Stage': [
-                        'Product View', 'Search', 'Filter', 'Add to Cart', 'Remove from Cart',
-                        'Abandon Cart', 'Checkout Start', 'Purchase Complete'
-                    ],
-                    'Users': [
-                        funnel_metrics['product_view'],
-                        funnel_metrics['search'],
-                        funnel_metrics['filter'],
-                        funnel_metrics['add_to_cart'],
-                        funnel_metrics['remove_from_cart'],
-                        funnel_metrics['abandon_cart'],
-                        funnel_metrics['checkout_start'],
-                        funnel_metrics['purchase_complete']
-                    ]
-                }
+                
+                # Define the complete funnel stages in order
+                all_stages = [
+                    'product_view', 'search', 'filter', 'add_to_cart', 
+                    'remove_from_cart', 'abandon_cart', 'checkout_start', 'purchase_complete'
+                ]
+                
+                # Create DataFrame with all stages, filling in zeros for missing ones
+                funnel_data = []
+                for stage in all_stages:
+                    users = funnel_metrics.get(stage, 0)
+                    funnel_data.append({
+                        'Stage': stage.replace('_', ' ').title(),
+                        'Users': users
+                    })
+                
                 funnel_df = pd.DataFrame(funnel_data)
-                funnel_df['Percentage'] = (funnel_df['Users'] / funnel_df['Users'].iloc[0]) * 100 if funnel_df['Users'].iloc[0] > 0 else 0
-                fig_funnel = px.funnel(funnel_df, x='Percentage', y='Stage', title=f'User Journey Funnel - {selected_cluster_label}')
+                
+                # Create the funnel chart
+                fig_funnel = px.funnel(
+                    funnel_df, 
+                    x='Users', 
+                    y='Stage', 
+                    title=f'User Journey Funnel - {selected_cluster_label}'
+                )
+                
+                # Customize the chart to show zero values clearly
+                fig_funnel.update_layout(
+                    xaxis=dict(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)'),
+                    yaxis=dict(showgrid=True, gridwidth=1, gridcolor='rgba(128,128,128,0.2)')
+                )
+                
                 st.plotly_chart(fig_funnel, use_container_width=True)
+                
+                # Add a summary of the funnel
+                total_users = funnel_df['Users'].max() if not funnel_df.empty else 0
+                if total_users > 0:
+                    st.markdown(f"**Total users in this cluster: {total_users}**")
+                    
+                    # Show conversion rates between key stages
+                    product_view = funnel_df[funnel_df['Stage'] == 'Product View']['Users'].iloc[0] if len(funnel_df[funnel_df['Stage'] == 'Product View']) > 0 else 0
+                    add_to_cart = funnel_df[funnel_df['Stage'] == 'Add To Cart']['Users'].iloc[0] if len(funnel_df[funnel_df['Stage'] == 'Add To Cart']) > 0 else 0
+                    checkout_start = funnel_df[funnel_df['Stage'] == 'Checkout Start']['Users'].iloc[0] if len(funnel_df[funnel_df['Stage'] == 'Checkout Start']) > 0 else 0
+                    purchase_complete = funnel_df[funnel_df['Stage'] == 'Purchase Complete']['Users'].iloc[0] if len(funnel_df[funnel_df['Stage'] == 'Purchase Complete']) > 0 else 0
+                    
+                    if product_view > 0:
+                        browse_to_cart_rate = (add_to_cart / product_view) * 100
+                        st.markdown(f"**Browse to Cart Rate**: {browse_to_cart_rate:.1f}%")
+                    
+                    if add_to_cart > 0:
+                        cart_to_checkout_rate = (checkout_start / add_to_cart) * 100
+                        st.markdown(f"**Cart to Checkout Rate**: {cart_to_checkout_rate:.1f}%")
+                    
+                    if checkout_start > 0:
+                        checkout_to_purchase_rate = (purchase_complete / checkout_start) * 100
+                        st.markdown(f"**Checkout to Purchase Rate**: {checkout_to_purchase_rate:.1f}%")
 
                 # Display pain points and hypotheses - retrieve from session state
                 st.subheader("Pain Points & Testable Hypotheses")

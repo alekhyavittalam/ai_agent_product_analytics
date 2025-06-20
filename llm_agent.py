@@ -70,6 +70,8 @@ class LLMAgent:
         prompt = f"""You are a product analytics assistant analyzing a user cluster.
         Your primary goal is to create a specific and descriptive persona for this cluster.
 
+        **Your generated name and persona MUST be directly supported by the data provided.** Do not infer actions that are not present in the metrics (e.g., if 'purchase_complete' is 0, do not name the cluster 'Purchase Completers'). Base your analysis strictly on the numbers you see.
+
         **Crucially, you must incorporate a time-based analysis into your response.** Analyze the 'time_range' provided.
         - If the duration between the start and end time is short (e.g., minutes or hours), it implies users are acting quickly.
         - If the duration is long (e.g., multiple days), it implies a slower, more deliberate user journey.
