@@ -68,13 +68,19 @@ class LLMAgent:
 
         # Final prompt string
         prompt = f"""You are a product analytics assistant analyzing a user cluster.
-        Please infer and explain where users drop off in their shopping journey — for example, Who drops off after viewing but doesn't add to cart?, Who adds to cart but never checks out?, Who are your power users? etc.
-        Do not just describe the most frequent actions — focus on user intent and where it breaks.
+        Your primary goal is to create a specific and descriptive persona for this cluster.
+
+        **Crucially, you must incorporate a time-based analysis into your response.** Analyze the 'time_range' provided.
+        - If the duration between the start and end time is short (e.g., minutes or hours), it implies users are acting quickly.
+        - If the duration is long (e.g., multiple days), it implies a slower, more deliberate user journey.
+        Use this temporal insight to make the cluster name more specific. For example, instead of just 'Cart Abandoners', you could have 'Quick Cart Abandoners' for users who abandon within minutes, or 'Multi-Day Cart Abandoners' for those who take longer.
+
+        Please infer and explain where users drop off in their shopping journey. Do not just describe the most frequent actions — focus on user intent and where it breaks.
 
         Cluster Overview:
         - Number of users: {cluster_summary['user_count']}
         - Total actions: {cluster_summary['total_actions']}
-        - Average actions per user: {cluster_summary['avg_actions_per_user']}
+        - Average actions per user: {cluster_summary['avg_actions_per_user']:.2f}
         - Most common actions: {cluster_summary['common_actions']}
         - Time range: {cluster_summary['time_range']['start']} to {cluster_summary['time_range']['end']}
         {detailed_stats}
