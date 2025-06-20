@@ -1,4 +1,4 @@
-# Shopping Website Behavioral Analysis Dashboard
+# AI Powered Behavioral Analysis
 
 ## Overview
 This Streamlit application provides a powerful tool for analyzing user behavior on a shopping website. It leverages clustering techniques (UMAP + HDBSCAN) and AI-powered insights to identify user segments, pinpoint drop-off points in the shopping journey, and generate actionable recommendations with testable hypotheses.
