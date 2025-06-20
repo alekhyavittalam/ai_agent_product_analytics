@@ -69,13 +69,13 @@ def generate_markdown_report(cluster_summary: Dict, insights: Dict, funnel_df: p
 - **Completion Rate**: {cluster_summary['completion_rate']:.2f}%
 
 ## User Journey Funnel
-| Stage | Users | Percentage |
-|-------|-------|------------|
+| Stage | Users |
+|-------|-------|
 """
     
-    # Add funnel data
+    # Add funnel data - use the new structure
     for _, row in funnel_df.iterrows():
-        md_content += f"| {row['Stage']} | {row['Users']} | {row['Percentage']:.2f}% |\n"
+        md_content += f"| {row['Stage']} | {row['Users']} |\n"
     
     # Add pain points and hypotheses
     md_content += "\n## Pain Points & Hypotheses\n"
